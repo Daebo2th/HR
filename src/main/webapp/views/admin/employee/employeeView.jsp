@@ -499,6 +499,7 @@
 <script src="/assets/js/main.js"></script>
 <script type="text/javascript" src="/assets/js/modal.js"></script>
 <script src="/assets/js/moment.js"></script>
+</body>
 <script type="text/javascript">
     updateRowsPerPage(18);
     /* 사원번호 동시입력 이벤트 */
@@ -571,12 +572,15 @@
 
     /* 사원 추가하기 */
     $("#sendEmp").click(function () {
-        name = "emp-email"
         if ($.trim($("#keyEmp").val()) == "") {
             alert("사원번호를 입력해주세요")
             return false;
         }
         if ($.trim($("input[name='emp-name']").val()) == "") {
+            alert("이름을 입력해주세요")
+            return false;
+        }
+        if ($.trim($("input[name='emp-email']").val()) == "") {
             alert("이메일을 입력해주세요")
             return false;
         }
@@ -597,7 +601,10 @@
                 alert("이미 등록된 이메일입니다.");
             } else {
                 alert("이메일로 아이디와 비밀번호를 전송하였습니다.");
-                window.location.href = "/emp.do?cate=nav-emp"
+                $('.modal_nav').hide()
+
+                $('#tab-3').show()
+                $('input[type="submit"]').attr('form', $('#tab-3').children('form').attr("id"))
             }
         }
 
@@ -605,6 +612,26 @@
             alert("실패" + e.status)
         }
     })
+
+    function resetPwd(email) {
+
+        const pwd = prompt("변경하실 비밀번호를 입력해주세요")
+        $.ajax({
+            url: "/updatePwdok.do",
+            type: "post",
+            data: {
+                "email": email,
+                "pwd": pwd
+            },
+            dataType: "json",
+            success: sucFuncJson,
+        });
+
+        function sucFuncJson(){
+            alert("변경되었습니다.")
+        }
+    }
+
 
     /* 경력 테이블 동적 추가 이벤트*/
     $(document).on("click", "#career_table", function () {
@@ -750,13 +777,16 @@
             <td><textarea class="emptext" name="emp-reason" id="emptext" ></textarea>
          </tr>
          <tr>
-										<th>근로정보</th>
-										<td><select class="profiletype" name="emp-workNum">
-												<c:forEach var="list" items="${optWork}">
-													<option value="${list.work_num}">${list.work_name}</option>
-												</c:forEach>
-										</select></td>
-									</tr>
+            <th>근로정보</th>
+            <td><select class="profiletype" name="emp-workNum">
+                    <c:forEach var="list" items="${optWork}">
+                        <option value="${list.work_num}">${list.work_name}</option>
+                    </c:forEach>
+            </select></td>
+
+            <th class="right" >비밀번호 초기화</th>
+            <td><input type="button" onclick="resetPwd('` + $email + `')" value="초기화" />
+        </tr>
          <tr>
             <th class="two">메모</th>
             <td colspan='3'><textarea class="diaempmemo" name="remarks" value="` + $remarks + `"></textarea>
@@ -831,7 +861,7 @@
                     <td>` + value.work_name + `</td>
                     <td>` + hireDate + `</td>
                     <td>` + value.annual_num + `</td>
-                    <td>` + (value.remarks != null ? value.remarks:'') + `</td>
+                    <td>` + (value.remarks != null ? value.remarks : '') + `</td>
                 </tr>
                 `;
 
@@ -908,5 +938,4 @@
         }
     })
 </script>
-</body>
 </html>
