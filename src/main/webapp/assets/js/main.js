@@ -1,6 +1,4 @@
 /* 출퇴근 버튼 토글 및 ajax */
-
-
 let storageAttState = localStorage.getItem('attendanceState');
 if(storageAttState!=null && storageAttState == 1){
     document.getElementById("rounded").checked = true;
@@ -23,10 +21,17 @@ $('#rounded').click(function () {
     function sucFuncJson(data) {
         const status = data.status;
         if (status == "true") {
+            alert(data.msg)
             localStorage.setItem('attendanceState', state);
-
+            location.reload();
         } else if (status == "false") {
-            alert("에러발생: <br>" + data.error)
+            if(data.error!=null){
+                alert("에러발생: <br>" + data.error)
+                return;
+            }
+            alert(data.msg)
+            document.getElementById("rounded").checked = false;
+            localStorage.setItem('attendanceState', 0);
         }
     }
 
