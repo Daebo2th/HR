@@ -1,13 +1,10 @@
 package com.kosa.hrsystem.service;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -15,24 +12,19 @@ import java.util.Objects;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
-import com.kosa.hrsystem.action.Action;
 import com.kosa.hrsystem.action.ActionForward;
 import com.kosa.hrsystem.dao.*;
 import com.kosa.hrsystem.dto.CareerDTO;
 import com.kosa.hrsystem.dto.CertificateDTO;
 import com.kosa.hrsystem.dto.CodeTableDTO;
 import com.kosa.hrsystem.dto.EmpDTO;
-import com.kosa.hrsystem.dto.WorkDTO;
-import com.kosa.hrsystem.dto.WorkScheduleTypeDTO;
 import com.kosa.hrsystem.utils.Encrypt;
 import com.kosa.hrsystem.utils.NaverSMTP;
 import com.kosa.hrsystem.utils.RandomPwd;
 import com.kosa.hrsystem.vo.EmpVO;
 import com.kosa.hrsystem.vo.MyPageVO;
-import com.kosa.hrsystem.vo.WorkScheduleVO;
 import com.kosa.hrsystem.vo.WorkVO;
 
 import org.json.simple.JSONArray;
@@ -66,33 +58,33 @@ public class EmpServiceImp implements EmpService {
     }
 
     @Override
-    public ActionForward insert(HttpServletRequest request, HttpServletResponse response) {
+    public void insert(HttpServletRequest request, HttpServletResponse response) {
         EmpDAO dao = new EmpDAO();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         RandomPwd rp = new RandomPwd();
 
 
-        String emp_name = Objects.requireNonNullElse(request.getParameter("emp-name"), "");
-        int emp_num = Integer.parseInt(Objects.requireNonNullElse(request.getParameter("emp-num"), "0"));
-        String emp_email = Objects.requireNonNullElse(request.getParameter("emp-email"), "");
-        String emp_pwd = rp.generateRandomPassword(12);
-        String emp_dept = Objects.requireNonNullElse(request.getParameter("emp-dept"), "");
-        String emp_regist_num = Objects.requireNonNullElse(request.getParameter("emp-regist-num"), "");
-        String emp_rank = Objects.requireNonNullElse(request.getParameter("emp-rank"), "");
-        String emp_phone = Objects.requireNonNullElse(request.getParameter("emp-phone"), "");
-        int emp_permission_type = Integer.parseInt(Objects.requireNonNullElse(request.getParameter("emp-permission-type"), "0"));
-        String emp_direct_num = Objects.requireNonNullElse(request.getParameter("emp-direct-num"), "");
-        String emp_post_code = Objects.requireNonNullElse(request.getParameter("emp-post-code"), "");
-        String emp_address = Objects.requireNonNullElse(request.getParameter("emp-address"), "");
-        String emp_detail_address = Objects.requireNonNullElse(request.getParameter("emp-detail-address"), "");
-        String emp_reason = Objects.requireNonNullElse(request.getParameter("emp-reason"), "");
-        String emp_remarks = Objects.requireNonNullElse(request.getParameter("remarks"), "");
-        String emp_hire_date = Objects.requireNonNullElse(request.getParameter("emp-hire-date"), "");
-        String emp_departure_date = Objects.requireNonNullElse(request.getParameter("emp-departure-date"), "");
+        String empName = Objects.requireNonNullElse(request.getParameter("emp-name"), "");
+        int empNum = Integer.parseInt(request.getParameter("emp-num"));
+        String empEmail = request.getParameter("emp-email");
+        String empPwd = rp.generateRandomPassword(12);
+        String empDept = request.getParameter("emp-dept");
+        String empRegistNum = Objects.requireNonNullElse(request.getParameter("emp-regist-num"), "");
+        String empRank = request.getParameter("emp-rank");
+        String empPhone = Objects.requireNonNullElse(request.getParameter("emp-phone"), "");
+        int empPermissionType = Integer.parseInt(request.getParameter("emp-permission-type"));
+        String empDirectNum = Objects.requireNonNullElse(request.getParameter("emp-direct-num"), "");
+        String empPostCode = Objects.requireNonNullElse(request.getParameter("emp-post-code"), "");
+        String empAddress = Objects.requireNonNullElse(request.getParameter("emp-address"), "");
+        String empDetailAddress = Objects.requireNonNullElse(request.getParameter("emp-detail-address"), "");
+        String empReason = Objects.requireNonNullElse(request.getParameter("emp-reason"), "");
+        String empRemarks = Objects.requireNonNullElse(request.getParameter("remarks"), "");
+        String empHireDate = request.getParameter("emp-hire-date");
+        String empDepartureDate = Objects.requireNonNullElse(request.getParameter("emp-departure-date"), "");
         int work_num = Integer.parseInt(Objects.requireNonNullElse(request.getParameter("emp-workNum"), "0"));
 
-        int result = dao.checkEmail(emp_email);
+        int result = dao.checkEmail(empEmail);
 
         JSONObject json = new JSONObject();
 
@@ -102,30 +94,30 @@ public class EmpServiceImp implements EmpService {
             json.put("status", "true");
 
             Encrypt en = new Encrypt();
-            String encryptPwd = en.getEncrypt(emp_pwd); // 암호화 emp_pwd
-            emailSend(emp_email, emp_pwd); // 메일 전송
+            String encryptPwd = en.getEncrypt(empPwd); // 암호화 emp_pwd
+            emailSend(empEmail, empPwd); // 메일 전송
 
             try {
                 EmpDTO dto = new EmpDTO();
-                dto.setEmp_num(emp_num);
-                dto.setEmp_name(emp_name);
-                dto.setEmail(emp_email);
+                dto.setEmp_num(empNum);
+                dto.setEmp_name(empName);
+                dto.setEmail(empEmail);
                 dto.setPwd(encryptPwd);
-                dto.setDept(emp_dept);
-                dto.setRegist_num(emp_regist_num);
-                dto.setRank(emp_rank);
-                dto.setPhone(emp_phone);
-                dto.setPermission_type(emp_permission_type);
-                dto.setDirect_num(emp_direct_num);
-                dto.setPost_code(emp_post_code);
-                dto.setAddress(emp_address);
-                dto.setDetail_address(emp_detail_address);
-                dto.setRemarks(emp_remarks);
-                dto.setReason(emp_reason);
-                dto.setHire_date(sdf.parse(emp_hire_date));
+                dto.setDept(empDept);
+                dto.setRegist_num(empRegistNum);
+                dto.setRank(empRank);
+                dto.setPhone(empPhone);
+                dto.setPermission_type(empPermissionType);
+                dto.setDirect_num(empDirectNum);
+                dto.setPost_code(empPostCode);
+                dto.setAddress(empAddress);
+                dto.setDetail_address(empDetailAddress);
+                dto.setRemarks(empRemarks);
+                dto.setReason(empReason);
+                dto.setHire_date(sdf.parse(empHireDate));
                 dto.setWork_num(work_num);
-                if (!emp_departure_date.equals("")) {
-                    dto.setDeparture_date(sdf.parse(emp_departure_date));
+                if (!empDepartureDate.equals("")) {
+                    dto.setDeparture_date(sdf.parse(empDepartureDate));
                 } else {
                     dto.setDeparture_date(null);
                 }
@@ -135,6 +127,7 @@ public class EmpServiceImp implements EmpService {
                 e.printStackTrace();
             }
         }
+
         try {
             response.setCharacterEncoding("utf-8");
             response.getWriter().print(json);
@@ -142,8 +135,6 @@ public class EmpServiceImp implements EmpService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        return null;
     }
 
     @Override
@@ -152,39 +143,39 @@ public class EmpServiceImp implements EmpService {
         RandomPwd rp = new RandomPwd();
 
         int emp_num = Integer.parseInt(request.getParameter("emp-num"));
-        String emp_name = request.getParameter("emp-name");
-        String emp_dept = request.getParameter("emp-dept");
-        String emp_rank = request.getParameter("emp-rank");
-        String emp_phone = request.getParameter("emp-phone");
-        int emp_permission_type = Integer.parseInt(request.getParameter("emp-permission-type"));
-        String emp_direct_num = request.getParameter("emp-direct-num");
-        String emp_post_code = request.getParameter("emp-post-code");
-        String emp_address = request.getParameter("emp-address");
-        String emp_detail_address = request.getParameter("emp-detail-address");
-        String emp_reason = request.getParameter("emp-reason");
-        String emp_remarks = request.getParameter("remarks");
-        String emp_hire_date = request.getParameter("emp-hire-date");
-        String emp_departure_date = request.getParameter("emp-departure-date");
+        String empName = request.getParameter("emp-name");
+        String empDept = request.getParameter("emp-dept");
+        String empRank = request.getParameter("emp-rank");
+        String empPhone = request.getParameter("emp-phone");
+        int empPermissionType = Integer.parseInt(request.getParameter("emp-permission-type"));
+        String empDirectNum = request.getParameter("emp-direct-num");
+        String empPostCode = request.getParameter("emp-post-code");
+        String empAddress = request.getParameter("emp-address");
+        String empDetailAddress = request.getParameter("emp-detail-address");
+        String empReason = request.getParameter("emp-reason");
+        String empRemarks = request.getParameter("remarks");
+        String empHireDate = request.getParameter("emp-hire-date");
+        String empDepartureDate = request.getParameter("emp-departure-date");
         String workNum = request.getParameter("workNum");
 
         try {
             EmpDTO dto = new EmpDTO();
             dto.setEmp_num(emp_num);
-            dto.setEmp_name(emp_name);
-            dto.setDept(emp_dept);
-            dto.setRank(emp_rank);
-            dto.setPhone(emp_phone);
-            dto.setPermission_type(emp_permission_type);
-            dto.setDirect_num(emp_direct_num);
-            dto.setPost_code(emp_post_code);
-            dto.setAddress(emp_address);
-            dto.setDetail_address(emp_detail_address);
-            dto.setReason(emp_reason);
-            dto.setRemarks(emp_remarks);
-            dto.setHire_date(sdf.parse(emp_hire_date));
+            dto.setEmp_name(empName);
+            dto.setDept(empDept);
+            dto.setRank(empRank);
+            dto.setPhone(empPhone);
+            dto.setPermission_type(empPermissionType);
+            dto.setDirect_num(empDirectNum);
+            dto.setPost_code(empPostCode);
+            dto.setAddress(empAddress);
+            dto.setDetail_address(empDetailAddress);
+            dto.setReason(empReason);
+            dto.setRemarks(empRemarks);
+            dto.setHire_date(sdf.parse(empHireDate));
             dto.setWork_num(Integer.parseInt(workNum));
-            if (!emp_departure_date.equals("")) {
-                dto.setDeparture_date(sdf.parse(emp_departure_date));
+            if (!empDepartureDate.equals("")) {
+                dto.setDeparture_date(sdf.parse(empDepartureDate));
             } else {
                 dto.setDeparture_date(null);
             }
@@ -244,8 +235,8 @@ public class EmpServiceImp implements EmpService {
         String registNum = request.getParameter("regist-num");
         //System.out.println(name + " , " + registNum);
         HashMap<String, String> map = new HashMap<>();
-        map.put("emp_name", name);
-        map.put("regist_num", registNum);
+        map.put("empName", name);
+        map.put("registNum", registNum);
 
         EmpDAO dao = new EmpDAO();
         String email = dao.searchId(map);

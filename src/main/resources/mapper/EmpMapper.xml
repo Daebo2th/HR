@@ -30,7 +30,7 @@
     	select pwd from EMP where email = #{email, jdbcType=VARCHAR} and regist_num = #{regist_num, jdbcType=VARCHAR}
     </select>
     <select id="searchId" parameterType="HashMap" resultType="String">
-    	select email from EMP where emp_name = #{emp_name, jdbcType=VARCHAR} and regist_num = #{regist_num, jdbcType=VARCHAR}
+    	select email from EMP where emp_name = #{empName, jdbcType=VARCHAR} and regist_num = #{registNum, jdbcType=VARCHAR}
     </select>
     <select id="checkEmail" parameterType="String" resultType="Integer">
     	select count(*) from EMP where email = #{email}
