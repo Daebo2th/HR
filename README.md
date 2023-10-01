@@ -20,7 +20,7 @@
     ```
 
 # AWS 
-[PROJECT-HR WEB 바로가기](http://ec2-3-36-128-85.ap-northeast-2.compute.amazonaws.com:8080/login.do)
+~~[PROJECT-HR WEB 바로가기](http://ec2-3-36-128-85.ap-northeast-2.compute.amazonaws.com:8080/login.do)~~
 
 ```
 관리자 아이디
